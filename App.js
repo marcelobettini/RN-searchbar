@@ -1,11 +1,27 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+
+import { StyleSheet, Text, View, FlatList, Image, ActivityIndicator } from 'react-native';
+import { useFetch } from './hooks/useFetch';
+import { useState } from 'react';
+import User from './components/User';
 
 export default function App() {
-  return (
+  const [endpoint, setEndpoint] = useState('?results=20')
+  const [data, loading, error] = useFetch(endpoint);
+  if (loading) return (<ActivityIndicator />)
+  if (error) return (<Text>Crash, Boom, Bang!</Text>)
+
+  return data && (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+
+
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        data={data.results}
+        keyExtractor={(item, idx) => idx}
+        renderItem={({ item }) => <User user={item} />}
+      />
+
+
     </View>
   );
 }
@@ -17,4 +33,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  thumb: {
+    width: 30,
+    height: 30,
+    borderRadius: 50
+  }
 });
