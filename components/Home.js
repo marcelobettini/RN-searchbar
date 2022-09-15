@@ -9,6 +9,12 @@ const Home = () => {
   const navigation = useNavigation()
   const [endpoint, setEndpoint] = useState('?results=20')
   const [data, loading, error] = useFetch(endpoint);
+  const [dataQuery, setDataQuery] = useState([])
+
+  const handleQuery = (str) => {
+    const query = data.results.filter(e => e.name.first.toLowerCase().includes(str.toLowerCase()) || e.name.last.toLowerCase().includes(str.toLowerCase()))
+    setDataQuery(query)
+  }
 
   useEffect(() => {
     navigation.setOptions({
@@ -19,22 +25,20 @@ const Home = () => {
       },
       headerSearchBarOptions: {
         placeholder: 'Buscar',
-        onChangeText: (e) => { console.log(e.nativeEvent.text); }
-
+        onChangeText: (e) => handleQuery(e.nativeEvent.text)
       }
     })
-
-
-  }, [])
+    setDataQuery(data.results)
+  }, [data])
   if (loading) return (<ActivityIndicator />)
   if (error) return (<Text>Crash, Boom, Bang!</Text>)
 
-  return data && (
+  return dataQuery && (
     <View style={styles.container}>
       <FlatList
         style={styles.list}
         showsVerticalScrollIndicator={false}
-        data={data.results}
+        data={dataQuery}
         keyExtractor={(item, idx) => idx}
         renderItem={({ item }) => <User user={item} />}
       />
